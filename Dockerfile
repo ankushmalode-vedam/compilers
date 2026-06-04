@@ -34,8 +34,12 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://www.ruby-lang.org/en/downloads
+#ENV RUBY_VERSIONS \
+#    2.7.0 \
+#    2.7.8 \
+#    3.1.6
 ENV RUBY_VERSIONS \
-      2.7.0
+      3.1.6
 RUN set -xe && \
     for VERSION in $RUBY_VERSIONS; do \
       curl -fSsL "https://cache.ruby-lang.org/pub/ruby/${VERSION%.*}/ruby-$VERSION.tar.gz" -o /tmp/ruby-$VERSION.tar.gz && \
@@ -165,7 +169,7 @@ RUN set -xe && \
       ./configure \
         --prefix=/usr/local/mono-$VERSION && \
       make -j$(nproc) && \
-      make -j$(proc) install && \
+      make -j$(nproc) install && \
       rm -rf /tmp/*; \
     done
 
