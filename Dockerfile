@@ -1,6 +1,7 @@
 # Check for latest version here: https://hub.docker.com/_/buildpack-deps?tab=tags&page=1&name=buster&ordering=last_updated
 # This is just a snapshot of buildpack-deps:buster that was last updated on 2019-12-28.
-FROM judge0/buildpack-deps:buster-2019-12-28
+#FROM judge0/buildpack-deps:buster-2019-12-28
+FROM buildpack-deps:latest
 
 # Check for latest version here: https://gcc.gnu.org/releases.html, https://ftpmirror.gnu.org/gcc
 ENV GCC_VERSIONS \
@@ -534,15 +535,57 @@ RUN set -xe && \
     locale-gen
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
+# RUN set -xe && \
+#     apt-get update && \
+#     apt-get install -y --no-install-recommends git libcap-dev && \
+#     rm -rf /var/lib/apt/lists/* && \
+#     git clone https://github.com/judge0/isolate.git /tmp/isolate && \
+#     cd /tmp/isolate && \
+#     git checkout ad39cc4d0fbb577fb545910095c9da5ef8fc9a1a && \
+#     make -j$(nproc) install && \
+#     rm -rf /tmp/*
 RUN set -xe && \
+    # sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g' /etc/apt/sources.list && \
+    # sed -i 's|security.debian.org/debian-security|archive.debian.org/debian-security|g' /etc/apt/sources.list && \
+    # sed -i '/buster-updates/d' /etc/apt/sources.list && \
+    # apt-get -o Acquire::Check-Valid-Until=false update && \
     apt-get update && \
-    apt-get install -y --no-install-recommends git libcap-dev && \
+    # Clean up apt cache immediately to save layer space
     rm -rf /var/lib/apt/lists/* && \
-    git clone https://github.com/judge0/isolate.git /tmp/isolate && \
+    # Install necessary packages for isolate and its dependencies
+    apt-get install -y --no-install-recommends git build-essential pkg-config libcap-dev libseccomp-dev libsystemd-dev ca-certificates && \
+    git clone https://github.com/ioi/isolate.git /tmp/isolate && \
     cd /tmp/isolate && \
-    git checkout ad39cc4d0fbb577fb545910095c9da5ef8fc9a1a && \
-    make -j$(nproc) install && \
-    rm -rf /tmp/*
+    git checkout v2.4 && \
+    make clean && \
+    make -j"$(nproc)" install
+
+#Debian Package Method
+# RUN set -xe && \
+#     apt-get update && \
+#     apt-get install -y --no-install-recommends ca-certificates curl gnupg && \
+#     mkdir -p /etc/apt/keyrings && \
+#     curl -fsSL https://ucw.cz > /etc/apt/keyrings/isolate.asc && \
+#     echo "Types: deb\nURIs: http://ucw.cz\nSuites: stable-isolate\nComponents: main\nArchitectures: amd64\nSigned-By: /etc/apt/keyrings/isolate.asc" > /etc/apt/sources.list.d/isolate.sources && \
+#     apt-get update && \
+#     apt-get install -y --no-install-recommends isolate && \
+#     rm -rf /var/lib/apt/lists/*
+
+# add user & security feature in Linux used to run rootless containers or sandboxes safely
+RUN set -xe && \
+    useradd -r -s /usr/sbin/nologin isolate && \
+    echo "isolate:100000:65536" > /etc/subuid && \
+    echo "ubuntu:165536:65536" >> /etc/subuid && \
+    echo "isolate:100000:65536" > /etc/subgid && \
+    echo "ubuntu:165536:65536" >> /etc/subgid && \
+    cat /etc/subuid && \
+    cat /etc/subgid
+
+#Create lock and box directories
+RUN set -xe && \
+    mkdir -p /run/isolate/locks && \
+    mkdir -p /var/local/lib/isolate && \
+    sed -i 's|cg_root = auto:/run/isolate/cgroup|cg_root = /sys/fs/cgroup|' /usr/local/etc/isolate
 ENV BOX_ROOT /var/local/lib/isolate
 
 LABEL maintainer="Herman Zvonimir Došilović <hermanz.dosilovic@gmail.com>"
