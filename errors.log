@@ -1,0 +1,41 @@
+ 1405 | const struct dsa_st *EVP_PKEY_get0_DSA(const EVP_PKEY *pkey);
+      |                      ^~~~~~~~~~~~~~~~~
+[0m[91mossl_pkey_dsa.c:23:11: warning: assignment discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   23 |     (dsa) = EVP_PKEY_get0_DSA(_pkey); \
+      |           ^
+ossl_pkey_dsa.c:390:5: note: in expansion of macro 'GetDSA'
+  390 |     GetDSA(self, dsa);
+      |     ^~~~~~
+[0m[91mossl_pkey_dsa.c:392:9: warning: 'i2d_DSAPrivateKey' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  392 |         i2d_func = (int (*)(DSA *,unsigned char **))i2d_DSAPrivateKey;
+      |         ^~~~~~~~
+[0m[91m/usr/include/openssl/dsa.h:154:1: note: declared here
+  154 | DECLARE_ASN1_ENCODE_FUNCTIONS_only_attr(OSSL_DEPRECATEDIN_3_0,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0m[91mossl_pkey_dsa.c:394:9: warning: 'i2d_DSA_PUBKEY' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  394 |         i2d_func = i2d_DSA_PUBKEY;
+      |         ^~~~~~~~
+[0m[91m/usr/include/openssl/x509.h:731:1: note: declared here
+  731 | DECLARE_ASN1_ENCODE_FUNCTIONS_only_attr(OSSL_DEPRECATEDIN_3_0, DSA, DSA_PUBKEY)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0m[91mossl_pkey_dsa.c:394:18: error: assignment to 'int (*)(DSA *, unsigned char **)' {aka 'int (*)(struct dsa_st *, unsigned char **)'} from incompatible pointer type 'int (*)(const DSA *, unsigned char **)' {aka 'int (*)(const struct dsa_st *, unsigned char **)'} [-Wincompatible-pointer-types]
+  394 |         i2d_func = i2d_DSA_PUBKEY;
+      |                  ^
+[0m[91mossl_pkey_dsa.c: In function 'ossl_dsa_get_params':
+[0m[91mossl_pkey_dsa.c:422:5: warning: 'EVP_PKEY_get0_DSA' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  422 |     GetDSA(self, dsa);
+      |     ^~~~~~
+[0m[91m/usr/include/openssl/evp.h:1405:22: note: declared here
+ 1405 | const struct dsa_st *EVP_PKEY_get0_DSA(const EVP_PKEY *pkey);
+      |                      ^~~~~~~~~~~~~~~~~
+[0m[91mossl_pkey_dsa.c:23:11: warning: assignment discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   23 |     (dsa) = EVP_PKEY_get0_DSA(_pkey); \
+      |           ^
+ossl_pkey_dsa.c:422:5: note: in expansion of macro 'GetDSA'
+  422 |     GetDSA(self, dsa);
+      |     ^~~~~~
+[0m[91mossl_pkey_dsa.c:423:5: warning: 'DSA_get0_pqg' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  423 |     DSA_get0_pqg(dsa, &p, &q, &g);
+      |     ^~~~~~~~~~~~
+[0m[91m/usr/include/openssl/dsa.h:205:28: note: declared here
+  205 | OSSL_DEPRECATEDIN_3_0 void DSA_get0_pqg(const DSA *d, const BIGNUM **p,

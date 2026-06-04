@@ -554,10 +554,10 @@ RUN set -xe && \
     # sed -i '/buster-updates/d' /etc/apt/sources.list && \
     # apt-get -o Acquire::Check-Valid-Until=false update && \
     apt-get update && \
-    # Clean up apt cache immediately to save layer space
-    rm -rf /var/lib/apt/lists/* && \
     # Install necessary packages for isolate and its dependencies
     apt-get install -y --no-install-recommends git build-essential pkg-config libcap-dev libseccomp-dev libsystemd-dev ca-certificates && \
+    # Clean up apt cache immediately to save layer space
+    rm -rf /var/lib/apt/lists/* && \
     git clone https://github.com/ioi/isolate.git /tmp/isolate && \
     cd /tmp/isolate && \
     git checkout v2.4 && \
