@@ -54,8 +54,6 @@ FROM buildpack-deps:latest
 RUN apt-get update && \
     apt-get install -y ruby-full && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /usr/local/ruby-2.7.0/bin && \
-    ln -sf $(which ruby) /usr/local/ruby-2.7.0/bin/ruby
 
 # # Check for latest version here: https://www.python.org/downloads
 # ENV PYTHON_VERSIONS \
@@ -75,25 +73,30 @@ RUN mkdir -p /usr/local/ruby-2.7.0/bin && \
 #       rm -rf /tmp/*; \
 #     done
 
+# # Check for latest version here: https://ftp.gnu.org/gnu/octave
+# ENV OCTAVE_VERSIONS \
+#       5.1.0
+# RUN set -xe && \
+#     apt-get update && \
+#     apt-get install -y --no-install-recommends gfortran libblas-dev liblapack-dev libpcre3-dev && \
+#     rm -rf /var/lib/apt/lists/* && \
+#     for VERSION in $OCTAVE_VERSIONS; do \
+#       curl -fSsL "https://ftp.gnu.org/gnu/octave/octave-$VERSION.tar.gz" -o /tmp/octave-$VERSION.tar.gz && \
+#       mkdir /tmp/octave-$VERSION && \
+#       tar -xf /tmp/octave-$VERSION.tar.gz -C /tmp/octave-$VERSION --strip-components=1 && \
+#       rm /tmp/octave-$VERSION.tar.gz && \
+#       cd /tmp/octave-$VERSION && \
+#       ./configure \
+#         --prefix=/usr/local/octave-$VERSION && \
+#       make -j$(nproc) && \
+#       make -j$(nproc) install && \
+#       rm -rf /tmp/*; \
+#     done
+
 # Check for latest version here: https://ftp.gnu.org/gnu/octave
-ENV OCTAVE_VERSIONS \
-      5.1.0
-RUN set -xe && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends gfortran libblas-dev liblapack-dev libpcre3-dev && \
-    rm -rf /var/lib/apt/lists/* && \
-    for VERSION in $OCTAVE_VERSIONS; do \
-      curl -fSsL "https://ftp.gnu.org/gnu/octave/octave-$VERSION.tar.gz" -o /tmp/octave-$VERSION.tar.gz && \
-      mkdir /tmp/octave-$VERSION && \
-      tar -xf /tmp/octave-$VERSION.tar.gz -C /tmp/octave-$VERSION --strip-components=1 && \
-      rm /tmp/octave-$VERSION.tar.gz && \
-      cd /tmp/octave-$VERSION && \
-      ./configure \
-        --prefix=/usr/local/octave-$VERSION && \
-      make -j$(nproc) && \
-      make -j$(nproc) install && \
-      rm -rf /tmp/*; \
-    done
+RUN apt-get update && \
+    apt-get install -y octave && \
+    rm -rf /var/lib/apt/lists/*
 
 # Check for latest version here: https://jdk.java.net
 # RUN set -xe && \
@@ -105,15 +108,9 @@ RUN set -xe && \
 #     ln -s /usr/local/openjdk13/bin/java /usr/local/bin/java && \
 #     ln -s /usr/local/openjdk13/bin/jar /usr/local/bin/jar
 
-RUN set -xe && \
-    apt-get update && \
-    apt-get install -y openjdk-17-jdk && \
+RUN apt-get update && \
+    apt-get install -y openjdk-25-jdk && \
     rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /usr/local/openjdk13/bin && \
-    ln -sf $(which java)  /usr/local/openjdk13/bin/java && \
-    ln -sf $(which javac) /usr/local/openjdk13/bin/javac && \
-    ln -sf $(which jar)   /usr/local/openjdk13/bin/jar
 
 # # Check for latest version here: https://ftpmirror.gnu.org/bash
 # ENV BASH_VERSIONS \
