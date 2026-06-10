@@ -43,7 +43,9 @@ RUN cd /tmp && \
     make -j$(nproc) && \
     make install && \
     echo "/usr/local/openssl-${OPENSSL_VERSION}/lib" > /etc/ld.so.conf.d/openssl-${OPENSSL_VERSION}.conf && \
-    ldconfig
+    ldconfig && \
+    ln -sf /etc/ssl/certs/ca-certificates.crt \
+      /usr/local/openssl-${OPENSSL_VERSION}/ssl/cert.pem
 
 # Check for latest version here: https://www.ruby-lang.org/en/downloads
 ENV RUBY_VERSIONS 2.7.0
