@@ -33,27 +33,42 @@ FROM buildpack-deps:latest
 #       rm -rf /tmp/*; \
 #     done
 
+ENV OPENSSL_VERSION=1.1.1w
+
+RUN cd /tmp && \
+    curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
+    tar -xzf openssl-${OPENSSL_VERSION}.tar.gz && \
+    cd openssl-${OPENSSL_VERSION} && \
+    ./config --prefix=/usr/local/openssl-${OPENSSL_VERSION} && \
+    make -j$(nproc) && \
+    make install && \
+    echo "/usr/local/openssl-${OPENSSL_VERSION}/lib" > /etc/ld.so.conf.d/openssl-${OPENSSL_VERSION}.conf && \
+    ldconfig
+
 # Check for latest version here: https://www.ruby-lang.org/en/downloads
-# ENV RUBY_VERSIONS 3.3.8
+ENV RUBY_VERSIONS 2.7.0
 
-# RUN set -xe && \
-#     for VERSION in $RUBY_VERSIONS; do \
-#       curl -fSsL "https://cache.ruby-lang.org/pub/ruby/${VERSION%.*}/ruby-$VERSION.tar.gz" -o /tmp/ruby-$VERSION.tar.gz && \
-#       mkdir /tmp/ruby-$VERSION && \
-#       tar -xf /tmp/ruby-$VERSION.tar.gz -C /tmp/ruby-$VERSION --strip-components=1 && \
-#       rm /tmp/ruby-$VERSION.tar.gz && \
-#       cd /tmp/ruby-$VERSION && \
-#       ./configure \
-#         --disable-install-doc \
-#         --prefix=/usr/local/ruby-$VERSION && \
-#       make -j$(nproc) && \
-#       make -j$(nproc) install && \
-#       rm -rf /tmp/*; \
-#     done
+RUN set -xe && \
+    for VERSION in $RUBY_VERSIONS; do \
+      curl -fSsL "https://cache.ruby-lang.org/pub/ruby/${VERSION%.*}/ruby-$VERSION.tar.gz" -o /tmp/ruby-$VERSION.tar.gz && \
+      mkdir /tmp/ruby-$VERSION && \
+      tar -xf /tmp/ruby-$VERSION.tar.gz -C /tmp/ruby-$VERSION --strip-components=1 && \
+      rm /tmp/ruby-$VERSION.tar.gz && \
+      cd /tmp/ruby-$VERSION && \
+      ./configure \
+        --disable-install-doc \
+        --with-openssl-dir=/usr/local/openssl-1.1.1w \
+        --prefix=/usr/local/ruby-$VERSION && \
+      make -j$(nproc) && \
+      make install && \
+      rm -rf /tmp/*; \
+    done
 
-RUN apt-get update && \
-    apt-get install -y ruby-full && \
-    rm -rf /var/lib/apt/lists/*
+RUN /usr/local/ruby-2.7.0/bin/ruby -ropenssl -e 'puts OpenSSL::OPENSSL_VERSION'
+
+#RUN apt-get update && \
+#    apt-get install -y ruby-full && \
+#    rm -rf /var/lib/apt/lists/*
 
 # # Check for latest version here: https://www.python.org/downloads
 # ENV PYTHON_VERSIONS \
